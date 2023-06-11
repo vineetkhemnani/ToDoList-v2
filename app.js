@@ -51,7 +51,7 @@ app.get("/about", function(req, res){
 app.get('/',async function(req, res){
     // res.send('Hello');
    
-        const foundItems = await Item.find();
+        const foundItems = await Item.find().catch((err) => console.log(err));
         if (foundItems.length === 0){
             await Item.insertMany(defaultItems).then(()=>{console.log("Default Items added")}).catch((err) => console.log(err));
             res.redirect("/");
@@ -64,7 +64,7 @@ app.get('/',async function(req, res){
 // creating a dynamic list using a dynamic route
 app.get('/:customListName', async function(req, res){
     const customListName = _.capitalize(req.params.customListName);
-    const foundList = await List.findOne({name: customListName});
+    const foundList = await List.findOne({name: customListName}).catch((err) => console.log(err));
     // console.log(foundList);
         if(!foundList){
             // console.log("Doesnt exist!!");
@@ -99,7 +99,7 @@ app.post('/', async function (req,res) {
         res.redirect('/');
     } else {
         try {
-            const foundList = await List.findOne({name: listName});
+            const foundList = await List.findOne({name: listName}).catch((err) => console.log(err));
             foundList.items.push(item);
             await foundList.save();
             res.redirect('/' + listName);
@@ -119,7 +119,7 @@ app.post('/delete', async function(req,res){
         await Item.findByIdAndRemove(checkedItemId).then(()=> {
             console.log("Successfully deleted checked item");
             res.redirect("/");
-        });
+        }).catch((err) => console.log(err));
 
     } else {
         const foundList = await List.findOneAndUpdate({name: listName}, {$pull: {items: {_id: checkedItemId}}}).catch((err)=>{console.log(err)});
